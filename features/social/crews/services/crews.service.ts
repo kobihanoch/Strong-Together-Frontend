@@ -2,6 +2,8 @@ import type {
   CreateCrewBody,
   CreateCrewResponse,
   DeleteCrewParams,
+  DeleteCrewProfilePictureParams,
+  DeleteCrewProfilePictureResponse,
   DeleteCrewResponse,
   GetCrewParams,
   GetCrewResponse,
@@ -12,11 +14,19 @@ import type {
   ListCrewParticipantsResponse,
   ListCrewsQuery,
   ListCrewsResponse,
+  ReplaceCrewProfilePictureParams,
+  ReplaceCrewProfilePictureResponse,
   UpdateCrewBody,
   UpdateCrewParams,
   UpdateCrewResponse,
 } from '@strong-together/shared';
 import api from '../../../../infrastructure/api/api-config/api';
+
+export type UploadableCrewProfilePicture = {
+  uri: string;
+  name?: string;
+  type?: string;
+};
 
 export const getDiscoverableCrews = async (query: ListCrewsQuery): Promise<ListCrewsResponse> => {
   const { data } = await api.get<ListCrewsResponse>('/api/social/crews', { params: query });
@@ -59,4 +69,31 @@ export const deleteCrew = async (crewId: DeleteCrewParams['id']): Promise<Delete
   const pathParams = { id: crewId } satisfies DeleteCrewParams;
   const { data } = await api.delete<DeleteCrewResponse>(`/api/social/crews/${pathParams.id}`);
   return data;
+};
+
+export const replaceCrewProfilePicture = async (
+  crewId: ReplaceCrewProfilePictureParams['id'],
+  file: UploadableCrewProfilePicture,
+): Promise<ReplaceCrewProfilePictureResponse> => {
+  const pathParams = { id: crewId } satisfies ReplaceCrewProfilePictureParams;
+  const formData = new FormData();
+  formData.append('file', {
+    uri: file.uri,
+    name: file.name ?? 'crew-profile.jpg',
+    type: file.type ?? 'image/jpeg',
+  } as unknown as Blob);
+
+  const { data } = await api.put<ReplaceCrewProfilePictureResponse>(
+    `/api/social/crews/${pathParams.id}/profile-picture`,
+    formData,
+    { headers: { 'Content-Type': 'multipart/form-data' } },
+  );
+  return data;
+};
+
+export const deleteCrewProfilePicture = async (
+  crewId: DeleteCrewProfilePictureParams['id'],
+): Promise<DeleteCrewProfilePictureResponse> => {
+  const pathParams = { id: crewId } satisfies DeleteCrewProfilePictureParams;
+  await api.delete(`/api/social/crews/${pathParams.id}/profile-picture`);
 };

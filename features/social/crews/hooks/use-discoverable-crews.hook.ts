@@ -14,15 +14,16 @@ const DEFAULT_PAGE_SIZE = 20;
  * action for loading the next page when an infinite list reaches its end.
  *
  * @param limit - Maximum number of crews requested per page. Defaults to 20.
+ * @param search - Optional text used to filter crews by name.
  * @returns Discoverable crews, pagination/loading state, and query actions.
  */
-export const useDiscoverableCrews = (limit = DEFAULT_PAGE_SIZE) => {
+export const useDiscoverableCrews = (limit = DEFAULT_PAGE_SIZE, search?: string) => {
   const { isValidatedWithServer, userIdCache: userId } = useAuth();
-  const queryKey = crewQueryKeys.discoverableByUser(userId, limit);
+  const queryKey = crewQueryKeys.discoverableByUser(userId, limit, search);
 
   const query = useInfiniteQuery({
     queryKey,
-    queryFn: ({ pageParam }) => getDiscoverableCrews({ limit, cursor: pageParam }),
+    queryFn: ({ pageParam }) => getDiscoverableCrews({ limit, cursor: pageParam, search }),
     initialPageParam: undefined as string | undefined,
     getNextPageParam: (lastPage) => lastPage.nextCursor ?? undefined,
     enabled: Boolean(isValidatedWithServer && userId),

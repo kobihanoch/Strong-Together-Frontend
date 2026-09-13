@@ -4,8 +4,8 @@ export const crewQueryKeys = {
   detailByUser: (crewId: string | undefined, userId: string | null) =>
     [...crewQueryKeys.detail(crewId), userId] as const,
   discoverable: () => [...crewQueryKeys.all, 'discoverable'] as const,
-  discoverableByUser: (userId: string | null, limit: number) =>
-    [...crewQueryKeys.discoverable(), userId, limit] as const,
+  discoverableByUser: (userId: string | null, limit: number, search?: string) =>
+    [...crewQueryKeys.discoverable(), userId, limit, search] as const,
   participants: (crewId: string | undefined) => [...crewQueryKeys.all, crewId, 'participants'] as const,
   participantsByUser: (crewId: string | undefined, userId: string | null, limit: number) =>
     [...crewQueryKeys.participants(crewId), userId, limit] as const,

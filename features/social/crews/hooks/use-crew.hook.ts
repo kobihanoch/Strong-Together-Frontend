@@ -9,10 +9,13 @@ import { crewQueryKeys } from '../query-keys';
 import {
   createCrew,
   deleteCrew,
+  deleteCrewProfilePicture,
   getCrew,
   leaveCrew,
+  replaceCrewProfilePicture,
   updateCrew,
 } from '../services/crews.service';
+import type { UploadableCrewProfilePicture } from '../services/crews.service';
 import { Crew } from '../types/crews.types';
 
 /**
@@ -89,6 +92,24 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
     onSuccess: removeCrewMembershipQueries,
   });
 
+  const replaceProfilePictureMutation = useMutation({
+    mutationFn: (file: UploadableCrewProfilePicture) => {
+      if (!userId) throw new Error('User is not authenticated');
+      if (!crewId) throw new Error('Crew ID is required');
+      return replaceCrewProfilePicture(crewId, file);
+    },
+    onSuccess: invalidateCrewQueries,
+  });
+
+  const deleteProfilePictureMutation = useMutation({
+    mutationFn: () => {
+      if (!userId) throw new Error('User is not authenticated');
+      if (!crewId) throw new Error('Crew ID is required');
+      return deleteCrewProfilePicture(crewId);
+    },
+    onSuccess: invalidateCrewQueries,
+  });
+
   const crew: Crew | undefined = crewQuery.data;
 
   return {
@@ -101,6 +122,8 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
       isUpdating: updateCrewMutation.isPending,
       isDeleting: deleteCrewMutation.isPending,
       isLeaving: leaveCrewMutation.isPending,
+      isReplacingProfilePicture: replaceProfilePictureMutation.isPending,
+      isDeletingProfilePicture: deleteProfilePictureMutation.isPending,
     },
     actions: {
       refetch: crewQuery.refetch,
@@ -108,6 +131,8 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
       updateCrew: updateCrewMutation.mutateAsync,
       deleteCrew: deleteCrewMutation.mutateAsync,
       leaveCrew: leaveCrewMutation.mutateAsync,
+      replaceProfilePicture: replaceProfilePictureMutation.mutateAsync,
+      deleteProfilePicture: deleteProfilePictureMutation.mutateAsync,
     },
   };
 };
