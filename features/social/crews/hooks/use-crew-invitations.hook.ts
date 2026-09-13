@@ -7,8 +7,9 @@ import type {
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
 import { crewQueryKeys } from '../query-keys';
-import { getCrewInvitations, inviteUserToCrew, updateCrewParticipationRequestStatus } from '../services/crews.service';
-import { CrewInvitations } from '../types/crews.types';
+import { getCrewInvitations, inviteUserToCrew } from '../services/crew-invitations.service';
+import { updateCrewParticipationRequestStatus } from '../services/crew-participation-requests.service';
+import { CrewInvitations } from '../types/crew-invitations.types';
 
 /**
  * Provides invitation server state and mutations for authenticated users.

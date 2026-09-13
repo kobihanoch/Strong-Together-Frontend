@@ -9,9 +9,9 @@ import { crewQueryKeys } from '../query-keys';
 import {
   getPendingCrewJoinRequests,
   requestToJoinCrew,
-  updateCrewParticipationRequestStatus,
-} from '../services/crews.service';
-import { CrewJoinRequests } from '../types/crews.types';
+} from '../services/crew-join-requests.service';
+import { updateCrewParticipationRequestStatus } from '../services/crew-participation-requests.service';
+import { CrewJoinRequests } from '../types/crew-join-requests.types';
 
 /**
  * Provides join-request server state and mutations for a crew.
