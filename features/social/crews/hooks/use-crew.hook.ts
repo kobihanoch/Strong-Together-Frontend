@@ -1,8 +1,18 @@
-import type { CreateCrewBody, GetCrewParams, UpdateCrewBody } from '@strong-together/shared';
+import type {
+  CreateCrewBody,
+  GetCrewParams,
+  UpdateCrewBody,
+} from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
 import { crewQueryKeys } from '../query-keys';
-import { createCrew, deleteCrew, getCrew, leaveCrew, updateCrew } from '../services/crews.service';
+import {
+  createCrew,
+  deleteCrew,
+  getCrew,
+  leaveCrew,
+  updateCrew,
+} from '../services/crews.service';
 import { Crew } from '../types/crews.types';
 
 /**
@@ -20,7 +30,7 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
   const queryClient = useQueryClient();
   const detailQueryKey = crewQueryKeys.detailByUser(crewId, userId);
 
-  const query = useQuery({
+  const crewQuery = useQuery({
     queryKey: detailQueryKey,
     queryFn: () => {
       if (!crewId) throw new Error('Crew ID is required');
@@ -79,21 +89,21 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
     onSuccess: removeCrewMembershipQueries,
   });
 
-  const crew: Crew | undefined = query.data;
+  const crew: Crew | undefined = crewQuery.data;
 
   return {
     data: { crew },
     loadingStates: {
-      isPending: query.isPending,
-      isLoading: query.isLoading,
-      isFetching: query.isFetching,
+      isPending: crewQuery.isPending,
+      isLoading: crewQuery.isLoading,
+      isFetching: crewQuery.isFetching,
       isCreating: createCrewMutation.isPending,
       isUpdating: updateCrewMutation.isPending,
       isDeleting: deleteCrewMutation.isPending,
       isLeaving: leaveCrewMutation.isPending,
     },
     actions: {
-      refetch: query.refetch,
+      refetch: crewQuery.refetch,
       createCrew: createCrewMutation.mutateAsync,
       updateCrew: updateCrewMutation.mutateAsync,
       deleteCrew: deleteCrewMutation.mutateAsync,

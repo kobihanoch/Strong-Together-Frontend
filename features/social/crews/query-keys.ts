@@ -9,4 +9,7 @@ export const crewQueryKeys = {
   participants: (crewId: string | undefined) => [...crewQueryKeys.all, crewId, 'participants'] as const,
   participantsByUser: (crewId: string | undefined, userId: string | null, limit: number) =>
     [...crewQueryKeys.participants(crewId), userId, limit] as const,
+  invitations: (userId: string | null) => [...crewQueryKeys.all, 'invitations', userId] as const,
+  joinRequests: (crewId: string | undefined, userId: string | null) =>
+    [...crewQueryKeys.all, crewId, 'join-requests', userId] as const,
 };
