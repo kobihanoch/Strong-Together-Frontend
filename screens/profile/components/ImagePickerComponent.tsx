@@ -8,6 +8,7 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import api from '../../../infrastructure/api/api-config/api';
 import { useAppTheme } from '../../../shared/providers/AppThemeProvider';
 import { UploadableFile } from '../../../features/user/services/media.service';
+import { useProfilePicture } from '../../../shared/hooks/use-profile-picture.hook';
 
 type ImagePickerComponentProps = {
   openActionSheet: () => void;
@@ -46,13 +47,9 @@ function ImagePickerComponent({
   const { colors: theme } = useAppTheme();
   const [viewerOpen, setViewerOpen] = useState(false);
 
-  const imageSource = profilePicPath
-    ? {
-        uri:
-          process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
-            ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${profilePicPath}`
-            : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${profilePicPath}`,
-      }
+  const profilePictureUrl = useProfilePicture(profilePicPath);
+  const imageSource = profilePictureUrl
+    ? { uri: profilePictureUrl }
     : gender === 'Female'
       ? require('../../../assets/woman.png')
       : require('../../../assets/man.png');
@@ -114,7 +111,7 @@ function ImagePickerComponent({
         ) : (
           <Image
             source={imageSource}
-            cachePolicy="disk"
+            cachePolicy="memory-disk"
             contentFit="cover"
             style={[styles.image, style]}
           />
@@ -126,7 +123,7 @@ function ImagePickerComponent({
       </View>
       <Modal visible={viewerOpen} transparent animationType="fade" onRequestClose={() => setViewerOpen(false)}>
         <Pressable style={styles.viewerBackdrop} onPress={() => setViewerOpen(false)} accessibilityLabel="Close profile photo">
-          <Image source={imageSource} contentFit="contain" style={styles.viewerImage} />
+          <Image source={imageSource} cachePolicy="memory-disk" contentFit="contain" style={styles.viewerImage} />
         </Pressable>
       </Modal>
     </View>

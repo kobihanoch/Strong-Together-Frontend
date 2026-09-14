@@ -97,6 +97,18 @@ Do not invent absent fields or infer capabilities from database columns that no 
 
 Preserve the existing app's typography, spacing philosophy, hierarchy, colors, button language, icon treatment, density, headers, separators, selective card use, and bottom navigation.
 
+### Responsive UI, theme, and typography rules
+
+- Use `useWindowDimensions` for screen-dependent layout. Do not use static module-level `Dimensions.get(...)` values for responsive screens because they do not update when the viewport changes.
+- Derive responsive spacing, component sizes, radii, and layout thresholds from the current `width` and `height`, then clamp every derived value to an intentional minimum and maximum. Follow the existing `Math.max(minimum, Math.min(value, maximum))` pattern or a local `clamp` helper.
+- Keep responsive calculations close to the component that owns the layout. Prefer a `createStyles(width, height, theme)` function when several related measurements depend on the viewport.
+- Use the active `AppThemeColors` supplied by `useAppTheme` or by a typed theme prop for every semantic UI color: canvas, surfaces, borders, primary actions, text, muted states, and icon colors.
+- Do not introduce hard-coded light-mode colors inside feature components when a matching theme token exists. Components must remain readable and intentional in both light and dark themes.
+- Use the shared `fontFamilies` and `fontSizes` tokens for all application copy. Preserve the established heading hierarchy and do not create feature-specific font families or arbitrary font sizes.
+- Typography communicates hierarchy before cards or decoration. Use title case for user-facing section headings such as `Community`; reserve uppercase, letter-spaced typography for compact eyebrow labels and metadata categories.
+- Account for narrow phones, wide phones, text scaling, long localized text, and orientation changes. Use flexible rows, `flexShrink`, `minWidth: 0`, line limits only when truncation is intentional, and touch targets large enough to remain usable at clamped minimum sizes.
+- Responsive behavior must preserve product hierarchy. On Home, the workout card remains dominant and the Community entry remains compact at every supported viewport size.
+
 Do not introduce:
 
 - `Your Crew` as a permanent single-crew concept.

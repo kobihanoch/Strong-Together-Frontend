@@ -7,22 +7,19 @@ import { RFValue } from 'react-native-responsive-fontsize';
 import { AppThemeColors } from '../../../shared/constants/theme';
 import { fontFamilies, fontSizes } from '../../../shared/constants/typography';
 import { HomeDashboardData } from '../types/use-home-page.types';
+import { useProfilePicture } from '../../../shared/hooks/use-profile-picture.hook';
 
 const HomeHeader = ({ data, theme, onInbox }: { data: HomeDashboardData['user']; theme: AppThemeColors; onInbox: () => void }) => {
-  const source = data.profilePicPath
-    ? {
-        uri:
-          process.env.EXPO_PUBLIC_ENVIRONMENT === 'production'
-            ? `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public/${data.profilePicPath}`
-            : `${process.env.EXPO_PUBLIC_DEV_IMAGE_BUCKET}/${data.profilePicPath}`,
-      }
+  const profilePictureUrl = useProfilePicture(data.profilePicPath);
+  const source = profilePictureUrl
+    ? { uri: profilePictureUrl }
     : data.gender === 'Female'
       ? require('../../../assets/woman.png')
       : require('../../../assets/man.png');
 
   return (
     <View style={styles.header}>
-      <Image source={source} style={[styles.avatar, { backgroundColor: theme.surfaceMuted }]} contentFit="cover" />
+      <Image source={source} cachePolicy="memory-disk" style={[styles.avatar, { backgroundColor: theme.surfaceMuted }]} contentFit="cover" />
       <Text style={[styles.greeting, { color: theme.textPrimary }]} numberOfLines={1}>
         Welcome, {data.displayName}
       </Text>

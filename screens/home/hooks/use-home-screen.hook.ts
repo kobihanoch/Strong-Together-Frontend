@@ -16,6 +16,7 @@ import { useWorkoutSchedule } from '../../../features/workout-schedule/hooks/use
 import { getTimeZoneFromStore } from '../../../shared/stores/time-zone.store';
 import { getBodyPartsForSplit } from '../../../features/workouts/plan/utils/workout-plan.utils';
 import { DateTime } from 'luxon';
+import { useSocialSummary } from '../../../features/social/summary/hooks/use-social-summary.hook';
 
 /**
  * Composes the Home screen view model from TanStack-backed feature data.
@@ -35,6 +36,7 @@ const useHomeScreen = () => {
   const { data: dashboardData, loadingStates: dashboardLoadingStates } = useDashboard();
   const { data: workoutHistoryData, loadingStates: workoutHistoryLoadingStates } = useWorkoutHistory();
   const { data: scheduleData, loadingStates: scheduleLoadingStates } = useWorkoutSchedule();
+  const { data: socialSummary, loadingStates: socialSummaryLoadingStates } = useSocialSummary();
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(
     workoutPlanData.workoutSplits,
@@ -100,6 +102,7 @@ const useHomeScreen = () => {
         hasTrainedToday: workoutHistoryData.hasTrainedToday,
         hasSchedule: scheduleData.hasScheduledWorkouts,
       },
+      community: socialSummary ?? null,
       user: {
         displayName: userData?.name?.trim().split(' ')[0] || userData?.username || 'Athlete',
         profilePicPath: userData?.profilePicPath ?? null,
@@ -168,6 +171,7 @@ const useHomeScreen = () => {
     userData?.gender,
     messagesData.unreadMessages.length,
     cardioData,
+    socialSummary,
   ]);
 
   return {
@@ -195,7 +199,8 @@ const useHomeScreen = () => {
         workoutPlanLoadingStates.isPending ||
         workoutHistoryLoadingStates.isPending ||
         scheduleLoadingStates.isPending ||
-        userLoadingStates.isPending,
+        userLoadingStates.isPending ||
+        socialSummaryLoadingStates.isPending,
       isCardioUpdating: cardioLoadingStates.isUpdating,
     },
   };

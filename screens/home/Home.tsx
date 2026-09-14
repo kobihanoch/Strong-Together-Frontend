@@ -14,8 +14,9 @@ import { colors } from '../../shared/constants/colors';
 import { useAppTheme } from '../../shared/providers/AppThemeProvider';
 import CardioEntrySheet from '../../features/workouts/cardio/components/CardioEntrySheet';
 import { usePullToRefresh } from '../../shared/hooks/use-pull-to-refresh.hook';
+import CommunitySummaryCard from './components/CommunitySummaryCard';
 
-const homeQueryNames = ['user', 'messages', 'workout-plan', 'workout-schedules', 'cardio-maps', 'home-dashboard', 'workout-history'];
+const homeQueryNames = ['user', 'messages', 'workout-plan', 'workout-schedules', 'cardio-maps', 'home-dashboard', 'workout-history', 'social'];
 
 const Home = () => {
   const { data, actions, loadingStates } = useHomeScreen();
@@ -81,6 +82,8 @@ const Home = () => {
               ) : (
                 <NoWorkoutCard theme={data.theme} onCreate={actions.createWorkout} />
               )}
+
+              <CommunitySummaryCard summary={data.community} theme={data.theme} />
 
               {data.state.hasWorkout ? (
                 <TrainingOverviewCard {...data.training} hasSchedule={data.state.hasSchedule} theme={data.theme} onManage={actions.openSchedule} />
