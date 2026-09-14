@@ -7,7 +7,17 @@ import type { SocialUsers } from '../types/social-users.types';
 
 const DEFAULT_PAGE_SIZE = 20;
 
-/** Searches public user profiles with cursor-based pagination. */
+/**
+ * Searches public user profiles after the authenticated session is
+ * server-validated and the normalized search term is non-empty.
+ *
+ * Results are cached by authenticated user, search term, and page size. Each
+ * fetched cursor page is flattened into one user collection for consumers.
+ *
+ * @param search - Text used to match public user profiles.
+ * @param limit - Maximum number of users requested per page. Defaults to 20.
+ * @returns Matching users, pagination/loading state, and query actions.
+ */
 export const useSocialUsers = (search: SearchSocialUsersQuery['search'], limit = DEFAULT_PAGE_SIZE) => {
   const { isValidatedWithServer, userIdCache: authenticatedUserId } = useAuth();
   const query = useInfiniteQuery({
