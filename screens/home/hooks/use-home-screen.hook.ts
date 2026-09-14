@@ -17,6 +17,7 @@ import { getTimeZoneFromStore } from '../../../shared/stores/time-zone.store';
 import { getBodyPartsForSplit } from '../../../features/workouts/plan/utils/workout-plan.utils';
 import { DateTime } from 'luxon';
 import { useSocialSummary } from '../../../features/social/summary/hooks/use-social-summary.hook';
+import { useCrewInvitations } from '../../../features/social/crews/invitations/hooks/use-crew-invitations.hook';
 
 /**
  * Composes the Home screen view model from TanStack-backed feature data.
@@ -37,6 +38,7 @@ const useHomeScreen = () => {
   const { data: workoutHistoryData, loadingStates: workoutHistoryLoadingStates } = useWorkoutHistory();
   const { data: scheduleData, loadingStates: scheduleLoadingStates } = useWorkoutSchedule();
   const { data: socialSummary, loadingStates: socialSummaryLoadingStates } = useSocialSummary();
+  const { data: invitationsData, loadingStates: invitationLoadingStates } = useCrewInvitations();
 
   const nextSplit: WorkoutSplit | undefined = getNextWorkoutSplit(
     workoutPlanData.workoutSplits,
@@ -108,6 +110,7 @@ const useHomeScreen = () => {
         profilePicPath: userData?.profilePicPath ?? null,
         gender: userData?.gender ?? null,
         unreadCount: messagesData.unreadMessages.length,
+        pendingInvitationCount: invitationsData.invitations.filter((invitation) => invitation.status === 'pending').length,
       },
       nextWorkout: nextSplit
         ? {
@@ -170,6 +173,7 @@ const useHomeScreen = () => {
     userData?.profilePicPath,
     userData?.gender,
     messagesData.unreadMessages.length,
+    invitationsData.invitations,
     cardioData,
     socialSummary,
   ]);
@@ -200,7 +204,8 @@ const useHomeScreen = () => {
         workoutHistoryLoadingStates.isPending ||
         scheduleLoadingStates.isPending ||
         userLoadingStates.isPending ||
-        socialSummaryLoadingStates.isPending,
+        socialSummaryLoadingStates.isPending ||
+        invitationLoadingStates.isLoading,
       isCardioUpdating: cardioLoadingStates.isUpdating,
     },
   };
