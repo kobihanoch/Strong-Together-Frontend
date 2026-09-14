@@ -5,6 +5,7 @@ import type {
 } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../../../auth/providers/AuthProvider';
+import { postQueryKeys } from '../../posts/query-keys';
 import { crewQueryKeys } from '../query-keys';
 import {
   createCrew,
@@ -54,6 +55,8 @@ export const useCrew = (crewId?: GetCrewParams['id']) => {
   const removeCrewMembershipQueries = async () => {
     queryClient.removeQueries({ queryKey: crewQueryKeys.detail(crewId) });
     queryClient.removeQueries({ queryKey: crewQueryKeys.participants(crewId) });
+    queryClient.removeQueries({ queryKey: crewQueryKeys.joinRequests(crewId, userId) });
+    queryClient.removeQueries({ queryKey: postQueryKeys.crew(crewId) });
     await queryClient.invalidateQueries({ queryKey: crewQueryKeys.discoverable() });
   };
 

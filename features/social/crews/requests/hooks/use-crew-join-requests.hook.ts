@@ -4,13 +4,10 @@ import type {
   UpdateCrewParticipationRequestStatusParams,
 } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../../../auth/providers/AuthProvider';
-import { crewQueryKeys } from '../query-keys';
-import {
-  getPendingCrewJoinRequests,
-  requestToJoinCrew,
-} from '../services/crew-join-requests.service';
-import { updateCrewParticipationRequestStatus } from '../services/crew-participation-requests.service';
+import { useAuth } from '../../../../auth/providers/AuthProvider';
+import { crewQueryKeys } from '../../query-keys';
+import { getPendingCrewJoinRequests, requestToJoinCrew } from '../services/crew-join-requests.service';
+import { updateCrewParticipationRequestStatus } from '../../services/crew-participation-requests.service';
 import { CrewJoinRequests } from '../types/crew-join-requests.types';
 
 /**
@@ -55,13 +52,20 @@ export const useCrewJoinRequests = (crewId?: GetCrewParams['id']) => {
       if (!userId) throw new Error('User is not authenticated');
       return updateCrewParticipationRequestStatus(requestId, body);
     },
-    onSuccess: async () => {
-      await Promise.all([
+    onSuccess: async (_, [, body]) => {
+      const invalidations = [
         queryClient.invalidateQueries({ queryKey: crewQueryKeys.joinRequests(crewId, userId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.participants(crewId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.detail(crewId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.discoverable() }),
-      ]);
+      ];
+
+      if (body.status === 'accepted') {
+        invalidations.push(
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.participants(crewId) }),
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.detail(crewId) }),
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.discoverable() }),
+        );
+      }
+
+      await Promise.all(invalidations);
     },
   });
 

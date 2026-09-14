@@ -4,7 +4,7 @@ import type {
   InviteCrewUserResponse,
   ListCrewInvitationsResponse,
 } from '@strong-together/shared';
-import api from '../../../../infrastructure/api/api-config/api';
+import api from '../../../../../infrastructure/api/api-config/api';
 
 export const getCrewInvitations = async (): Promise<ListCrewInvitationsResponse> => {
   const { data } = await api.get<ListCrewInvitationsResponse>('/api/social/crews/invitations');

@@ -4,7 +4,7 @@ import type {
   RequestToJoinCrewParams,
   RequestToJoinCrewResponse,
 } from '@strong-together/shared';
-import api from '../../../../infrastructure/api/api-config/api';
+import api from '../../../../../infrastructure/api/api-config/api';
 
 export const getPendingCrewJoinRequests = async (
   crewId: ListPendingCrewJoinRequestsParams['crewId'],

@@ -5,10 +5,10 @@ import type {
   UpdateCrewParticipationRequestStatusParams,
 } from '@strong-together/shared';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../../../auth/providers/AuthProvider';
-import { crewQueryKeys } from '../query-keys';
+import { useAuth } from '../../../../auth/providers/AuthProvider';
+import { crewQueryKeys } from '../../query-keys';
 import { getCrewInvitations, inviteUserToCrew } from '../services/crew-invitations.service';
-import { updateCrewParticipationRequestStatus } from '../services/crew-participation-requests.service';
+import { updateCrewParticipationRequestStatus } from '../../services/crew-participation-requests.service';
 import { CrewInvitations } from '../types/crew-invitations.types';
 
 /**
@@ -42,20 +42,28 @@ export const useCrewInvitations = (crewId?: GetCrewParams['id']) => {
   });
 
   const updateInvitationStatusMutation = useMutation({
-    mutationFn: ([requestId, body]: [
+    mutationFn: ([requestId, , body]: [
       UpdateCrewParticipationRequestStatusParams['requestId'],
+      GetCrewParams['id'],
       UpdateCrewParticipationRequestStatusBody,
     ]) => {
       if (!userId) throw new Error('User is not authenticated');
       return updateCrewParticipationRequestStatus(requestId, body);
     },
-    onSuccess: async () => {
-      await Promise.all([
+    onSuccess: async (_, [, affectedCrewId, body]) => {
+      const invalidations = [
         queryClient.invalidateQueries({ queryKey: crewQueryKeys.invitations(userId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.participants(crewId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.detail(crewId) }),
-        queryClient.invalidateQueries({ queryKey: crewQueryKeys.discoverable() }),
-      ]);
+      ];
+
+      if (body.status === 'accepted') {
+        invalidations.push(
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.participants(affectedCrewId) }),
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.detail(affectedCrewId) }),
+          queryClient.invalidateQueries({ queryKey: crewQueryKeys.discoverable() }),
+        );
+      }
+
+      await Promise.all(invalidations);
     },
   });
 
@@ -74,8 +82,9 @@ export const useCrewInvitations = (crewId?: GetCrewParams['id']) => {
       inviteUser: inviteUserMutation.mutateAsync,
       updateInvitationStatus: (
         requestId: UpdateCrewParticipationRequestStatusParams['requestId'],
+        affectedCrewId: GetCrewParams['id'],
         body: UpdateCrewParticipationRequestStatusBody,
-      ) => updateInvitationStatusMutation.mutateAsync([requestId, body]),
+      ) => updateInvitationStatusMutation.mutateAsync([requestId, affectedCrewId, body]),
     },
   };
 };

@@ -18,7 +18,7 @@ const DEFAULT_PAGE_SIZE = 20;
  * @param limit - Maximum number of users requested per page. Defaults to 20.
  * @returns Matching users, pagination/loading state, and query actions.
  */
-export const useSocialUsers = (search: SearchSocialUsersQuery['search'], limit = DEFAULT_PAGE_SIZE) => {
+export const useDiscoverableSocialUsers = (search: SearchSocialUsersQuery['search'], limit = DEFAULT_PAGE_SIZE) => {
   const { isValidatedWithServer, userIdCache: authenticatedUserId } = useAuth();
   const query = useInfiniteQuery({
     queryKey: socialUserQueryKeys.search(authenticatedUserId, search, limit),
